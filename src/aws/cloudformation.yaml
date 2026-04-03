@@ -1,0 +1,248 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  AI Decision Intelligence System — Phase 2 AWS Infrastructure.
+  Provisions S3, IAM roles, Lambda, EventBridge, and Glue job.
+  Deploy with: aws cloudformation deploy --template-file src/aws/cloudformation.yaml
+               --stack-name ai-decision-intelligence --capabilities CAPABILITY_NAMED_IAM
+
+# ── Parameters ────────────────────────────────────────────────────────────────
+Parameters:
+  BucketName:
+    Type: String
+    Description: Globally unique S3 bucket name (e.g. ai-decision-intelligence-yourname)
+    AllowedPattern: "^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$"
+
+  LambdaPackageKey:
+    Type: String
+    Default: lambda-package/deployment.zip
+    Description: S3 key for the Lambda deployment package (zip of project code)
+
+  ScheduleExpression:
+    Type: String
+    Default: "cron(0 3 * * ? *)"
+    Description: EventBridge schedule (default 03:00 UTC daily)
+
+  AthenaDatabase:
+    Type: String
+    Default: ai_decision_intelligence
+
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues: [production, staging, development]
+
+# ── Resources ─────────────────────────────────────────────────────────────────
+Resources:
+
+  # ── S3 Bucket ───────────────────────────────────────────────────────────────
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 90
+      Tags:
+        - Key: Project
+          Value: ai-decision-intelligence
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ── IAM Role: Lambda ────────────────────────────────────────────────────────
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AIDILambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: AIDILambdaS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${BucketName}"
+                  - !Sub "arn:aws:s3:::${BucketName}/*"
+              - Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                  - athena:StopQueryExecution
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - glue:StartJobRun
+                  - glue:GetJobRun
+                Resource: "*"
+
+  # ── IAM Role: Glue ──────────────────────────────────────────────────────────
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AIDIGlueServiceRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      Policies:
+        - PolicyName: AIDIGlueS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${BucketName}"
+                  - !Sub "arn:aws:s3:::${BucketName}/*"
+
+  # ── CloudWatch Log Group ────────────────────────────────────────────────────
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ai-decision-intelligence-runner"
+      RetentionInDays: 30
+
+  # ── Lambda Function ─────────────────────────────────────────────────────────
+  PipelineLambda:
+    Type: AWS::Lambda::Function
+    DependsOn: LambdaLogGroup
+    Properties:
+      FunctionName: ai-decision-intelligence-runner
+      Description: Runs the AI Decision Intelligence pipeline on a schedule
+      Runtime: python3.11
+      Handler: src.aws.lambda_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref LambdaPackageKey
+      Timeout: 300          # 5 minutes
+      MemorySize: 1024      # 1 GB (Prophet is memory-intensive)
+      Environment:
+        Variables:
+          ENV: !Ref Environment
+          AWS_BUCKET_NAME: !Ref BucketName
+          AWS_ATHENA_DATABASE: !Ref AthenaDatabase
+      Tags:
+        - Key: Project
+          Value: ai-decision-intelligence
+
+  # ── Glue Job ────────────────────────────────────────────────────────────────
+  GlueETLJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: ai-decision-intelligence-etl
+      Description: Transforms raw sales CSV into the canonical schema
+      Role: !GetAtt GlueServiceRole.Arn
+      Command:
+        Name: pythonshell
+        ScriptLocation: !Sub "s3://${BucketName}/scripts/glue_etl_script.py"
+        PythonVersion: "3"
+      DefaultArguments:
+        "--INPUT_PATH": !Sub "s3://${BucketName}/raw/source.csv"
+        "--OUTPUT_PATH": !Sub "s3://${BucketName}/processed/processed.csv"
+        "--job-language": "python"
+      MaxRetries: 1
+      Timeout: 60           # minutes
+      GlueVersion: "3.0"
+      Tags:
+        Project: ai-decision-intelligence
+
+  # ── EventBridge Rule ────────────────────────────────────────────────────────
+  DailyTriggerRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: ai-decision-intelligence-daily
+      Description: Trigger AI Decision Intelligence pipeline daily at 03:00 UTC
+      ScheduleExpression: !Ref ScheduleExpression
+      State: ENABLED
+      Targets:
+        - Id: AIDILambdaTarget
+          Arn: !GetAtt PipelineLambda.Arn
+          Input: '{"trigger": "eventbridge-scheduled"}'
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt PipelineLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt DailyTriggerRule.Arn
+
+  # ── Athena Workgroup ────────────────────────────────────────────────────────
+  AthenaWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: aidi-workgroup
+      Description: AI Decision Intelligence Athena queries
+      WorkGroupConfiguration:
+        ResultConfiguration:
+          OutputLocation: !Sub "s3://${BucketName}/athena-output/"
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: true
+      Tags:
+        - Key: Project
+          Value: ai-decision-intelligence
+
+# ── Outputs ───────────────────────────────────────────────────────────────────
+Outputs:
+  S3BucketName:
+    Description: S3 bucket for data storage
+    Value: !Ref DataBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
+
+  LambdaFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt PipelineLambda.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaArn"
+
+  GlueJobName:
+    Description: Glue ETL job name
+    Value: !Ref GlueETLJob
+    Export:
+      Name: !Sub "${AWS::StackName}-GlueJobName"
+
+  EventBridgeRuleArn:
+    Description: EventBridge rule ARN
+    Value: !GetAtt DailyTriggerRule.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EventBridgeRuleArn"

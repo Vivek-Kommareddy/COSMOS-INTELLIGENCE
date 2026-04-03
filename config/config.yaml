@@ -1,0 +1,89 @@
+# ============================================================
+# AI Decision Intelligence System — Configuration v2
+#
+# Sensitive values (API keys, credentials) must be set via
+# environment variables, not here. See .env.example.
+# ============================================================
+
+project:
+  name: ai-decision-intelligence
+  version: "2.0.0"
+  metric: revenue
+
+# ── Data paths (relative to project root) ──────────────────
+data:
+  raw_path:       data/raw/source.csv
+  processed_path: data/processed/processed.csv
+  synthetic_path: data/synthetic/synthetic.csv
+  date_column:    date
+  revenue_column: revenue
+  orders_column:  orders
+  # Analysis windows (days)
+  lookback_days:     14
+  comparison_days:   14
+
+# ── Anomaly detection ───────────────────────────────────────
+anomaly:
+  # Fraction of data expected to be anomalous (0.08 = 8%)
+  contamination: 0.08
+  # Tracked metrics for multi-metric analysis
+  tracked_metrics:
+    - revenue
+    - orders
+    - avg_order_value
+  severity_thresholds:
+    critical: -0.15
+    warning:  -0.05
+
+# ── Forecasting ─────────────────────────────────────────────
+forecast:
+  periods: 7
+  include_confidence_intervals: true
+  # Metrics to forecast
+  forecast_metrics:
+    - revenue
+    - orders
+    - avg_order_value
+
+# ── LLM explanation ─────────────────────────────────────────
+llm:
+  enabled: true
+  provider: anthropic
+  model: claude-haiku-4-5-20251001
+  max_tokens: 300
+  fallback_to_deterministic: true
+
+# ── FastAPI ─────────────────────────────────────────────────
+api:
+  title: "AI Decision Intelligence API"
+  version: "2.0.0"
+  description: >
+    Enterprise-grade AI system for automated multi-metric anomaly detection,
+    dimensional root cause analysis, revenue forecasting, and
+    prioritized executive decision recommendations.
+  enable_auth: false
+  cors_origins:
+    - "*"
+
+# ── Reporting ────────────────────────────────────────────────
+reporting:
+  cli_enabled: true
+  html_enabled: true
+  output_dir: outputs/
+
+# ── Logging ─────────────────────────────────────────────────
+logging:
+  level: INFO
+  format: json
+
+# ── AWS (Phase 2) ───────────────────────────────────────────
+aws:
+  region: us-east-1
+  bucket_name: ""
+  glue_job_name: ai-decision-intelligence-etl
+  athena_database: ai_decision_intelligence
+  athena_output_prefix: athena-output
+  athena_timeout_seconds: 60
+  eventbridge_rule: ai-decision-intelligence-daily
+  lambda_function_name: ai-decision-intelligence-runner
+  s3_upload_on_complete: false
