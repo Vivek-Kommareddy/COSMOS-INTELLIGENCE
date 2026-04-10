@@ -1,0 +1,330 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Cosmos Intelligence — Enterprise AI Analytics Platform (Full Stack)"
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Unique S3 bucket name for Cosmos Intelligence data
+  AnthropicApiKey:
+    Type: String
+    NoEcho: true
+    Description: Anthropic API key for Claude AI integration
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues: [production, staging, development]
+
+Resources:
+  # ── S3 BUCKETS ─────────────────────────────────────────
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteRawAfter30Days
+            Status: Enabled
+            Prefix: raw/
+            ExpirationInDays: 30
+          - Id: DeleteProcessedAfter7Days
+            Status: Enabled
+            Prefix: processed/
+            ExpirationInDays: 7
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET, PUT, POST, DELETE]
+            AllowedOrigins: ['*']
+            MaxAge: 3600
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketName}-frontend"
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # ── CLOUDFRONT ─────────────────────────────────────────
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: cosmos-intelligence.html
+        Comment: "Cosmos Intelligence Frontend CDN"
+        Origins:
+          - Id: S3Frontend
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !Ref CloudFrontOAC
+        DefaultCacheBehavior:
+          TargetOriginId: S3Frontend
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          AllowedMethods: [GET, HEAD]
+        PriceClass: PriceClass_100
+        HttpVersion: http2
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${BucketName}-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # ── SECRETS MANAGER ────────────────────────────────────
+  AnthropicSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "/cosmos-intelligence/${Environment}/anthropic-api-key"
+      Description: "Anthropic Claude API key for Cosmos Intelligence"
+      SecretString: !Sub '{"ANTHROPIC_API_KEY":"${AnthropicApiKey}"}'
+
+  # ── IAM ROLES ──────────────────────────────────────────
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "cosmos-intelligence-lambda-role-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CosmosIntelligencePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt DataBucket.Arn
+                  - !Sub "${DataBucket.Arn}/*"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref AnthropicSecret
+              - Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                  - glue:GetTable
+                  - glue:GetDatabase
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "cosmos-intelligence-glue-role-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      Policies:
+        - PolicyName: GlueS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject, s3:PutObject, s3:ListBucket]
+                Resource:
+                  - !GetAtt DataBucket.Arn
+                  - !Sub "${DataBucket.Arn}/*"
+
+  # ── GLUE DATABASE ──────────────────────────────────────
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: cosmos_intelligence
+        Description: "Cosmos Intelligence analytics data catalog"
+
+  GlueTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseName: !Ref GlueDatabase
+      TableInput:
+        Name: processed_analytics
+        Description: "Processed business analytics data"
+        TableType: EXTERNAL_TABLE
+        Parameters:
+          classification: csv
+          has_encrypted_data: "false"
+        StorageDescriptor:
+          Location: !Sub "s3://${BucketName}/processed/"
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+          SerdeInfo:
+            SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+            Parameters:
+              field.delim: ","
+              skip.header.line.count: "1"
+          Columns:
+            - Name: date
+              Type: string
+            - Name: region
+              Type: string
+            - Name: category
+              Type: string
+            - Name: channel
+              Type: string
+            - Name: campaign
+              Type: string
+            - Name: revenue
+              Type: double
+            - Name: orders
+              Type: int
+            - Name: avg_order_value
+              Type: double
+            - Name: conversion_rate
+              Type: double
+
+  # ── ATHENA ─────────────────────────────────────────────
+  AthenaWorkgroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: !Sub "cosmos-intelligence-${Environment}"
+      Description: "Cosmos Intelligence Athena workgroup"
+      WorkGroupConfiguration:
+        ResultConfiguration:
+          OutputLocation: !Sub "s3://${BucketName}/athena-output/"
+          EncryptionConfiguration:
+            EncryptionOption: SSE_S3
+        EnforceWorkGroupConfiguration: true
+        PublishCloudWatchMetricsEnabled: true
+
+  # ── LAMBDA ─────────────────────────────────────────────
+  PipelineLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "cosmos-intelligence-pipeline-${Environment}"
+      Description: "Cosmos Intelligence — AI analytics pipeline runner"
+      Runtime: python3.12
+      Handler: src.aws.lambda_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 900
+      MemorySize: 2048
+      Environment:
+        Variables:
+          AWS_BUCKET_NAME: !Ref BucketName
+          AWS_ATHENA_DATABASE: cosmos_intelligence
+          ANTHROPIC_SECRET_ARN: !Ref AnthropicSecret
+          ENVIRONMENT: !Ref Environment
+      Layers: []
+
+  # ── EVENTBRIDGE (scheduled daily run) ──────────────────
+  DailyScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "cosmos-intelligence-daily-${Environment}"
+      Description: "Trigger Cosmos Intelligence pipeline daily at 3 AM UTC"
+      ScheduleExpression: "cron(0 3 * * ? *)"
+      State: ENABLED
+      Targets:
+        - Id: PipelineLambdaTarget
+          Arn: !GetAtt PipelineLambda.Arn
+
+  LambdaEventPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PipelineLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt DailyScheduleRule.Arn
+
+  # ── CLOUDWATCH ─────────────────────────────────────────
+  PipelineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/cosmos-intelligence/${Environment}/pipeline"
+      RetentionInDays: 30
+
+  PipelineAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "cosmos-intelligence-pipeline-errors-${Environment}"
+      AlarmDescription: "Alert when pipeline Lambda errors exceed threshold"
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref PipelineLambda
+
+Outputs:
+  FrontendURL:
+    Description: "Cosmos Intelligence frontend URL (CloudFront)"
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}/cosmos-intelligence.html"
+  DataBucketName:
+    Description: "S3 bucket for data storage"
+    Value: !Ref DataBucket
+  LambdaFunctionName:
+    Description: "Pipeline Lambda function name"
+    Value: !Ref PipelineLambda
+  GlueDatabaseName:
+    Description: "Glue catalog database name"
+    Value: !Ref GlueDatabase
+  AthenaWorkgroupName:
+    Description: "Athena workgroup name"
+    Value: !Ref AthenaWorkgroup
