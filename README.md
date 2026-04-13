@@ -1,261 +1,406 @@
-# Cosmos Intelligence
-## Enterprise Autonomous Business Intelligence Platform
+<div align="center">
 
-> Turn raw business data into executive decisions in seconds.
-> Not just "what happened" — but why, what's next, and what to do.
+# ✦ COSMOS INTELLIGENCE
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/framework-FastAPI-00a000.svg)](https://fastapi.tiangolo.com/)
-[![Claude AI](https://img.shields.io/badge/AI-Claude%20%7C%20Anthropic-000000.svg)](https://www.anthropic.com/)
-[![AWS-Native](https://img.shields.io/badge/cloud-AWS%20Native-FF9900.svg)](https://aws.amazon.com/)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+### Enterprise Autonomous Business Intelligence Platform
+
+**Architected by [Vivek Kommareddy](https://github.com/Vivek-Kommareddy)**
+
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Claude AI](https://img.shields.io/badge/Claude_AI-Anthropic-FF6B35?style=for-the-badge)](https://www.anthropic.com/)
+[![AWS](https://img.shields.io/badge/AWS_App_Runner-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+<br/>
+
+> **"Here's what's happening, why it's happening, what will happen next, and what you should do."**
+>
+> Cosmos Intelligence transforms raw business data into executive decisions in seconds — not just "what happened," but the complete intelligence chain from anomaly to action.
+
+<br/>
+
+🌐 **[Live Demo](https://6nmkmjhh5i.us-east-1.awsapprunner.com)** · 📡 **[API Health](https://bpc53g62fh.us-east-1.awsapprunner.com/health)** · 📂 **[Repository](https://github.com/Vivek-Kommareddy/COSMOS-INTELLIGENCE)**
+
+</div>
 
 ---
 
-## What This Platform Does
+## What Makes This Different
 
-Cosmos Intelligence is an enterprise-grade AI system that automatically transforms raw business data into **actionable intelligence through five levels of progressive analysis**:
+Traditional business intelligence tools answer one question: *"What happened?"*
 
-```
-Level 1: SURFACE METRICS      Raw facts (revenue declined 22.4%)
-    ↓
-Level 2: ROOT CAUSE           Why it happened (Campaign A stopped, -62% impact)
-    ↓
-Level 3: FORECAST             What's next (further 18% drop expected)
-    ↓
-Level 4: RECOMMENDATIONS      What to do (restart campaign, +15-25% budget)
-    ↓
-Level 5: SIMULATION           What if scenarios (revenue impact modeling)
-```
+Cosmos Intelligence answers five:
 
-Unlike traditional dashboards that show "what happened," Cosmos Intelligence **explains why, predicts what's next, recommends actions, and helps executives simulate decisions** — all automatically, in seconds.
+| Level | Question | What You Get |
+|-------|----------|--------------|
+| **1 · Surface Metrics** | What happened? | KPIs, revenue, orders, AOV with period-over-period change |
+| **2 · Root Cause** | Why did it happen? | 9-dimension attribution with % contribution per factor |
+| **3 · Forecast** | What will happen? | 7–14 day predictions with 95% confidence intervals |
+| **4 · Recommendations** | What should I do? | Priority-ranked action items with impact estimates |
+| **5 · Simulation** | What if I do X? | Claude AI-powered scenario modeling and impact analysis |
 
-### Key Capabilities
-
-- **Anomaly Detection**: Isolation Forest multi-metric analysis detects revenue, volume, and price anomalies with severity scoring
-- **Root Cause Attribution**: 9-dimension breakdown (region, product, campaign, category, etc.) with contribution percentages
-- **Forecasting**: Prophet + linear regression with confidence intervals for 7-14 day horizons
-- **Executive Recommendations**: Priority-ranked action items with impact estimates and ownership
-- **AI Explanations**: Claude-powered natural language narratives that executives can understand and act on
-- **Data Privacy**: Complete hard-delete flow — raw data, processed, outputs, and AI context all deletable on demand
-- **REST API**: FastAPI endpoints for programmatic access, batch processing, and integration
+Upload any CSV. Get a full executive intelligence brief in under 3 seconds.
 
 ---
 
 ## Architecture
 
-### 7-Stage Intelligence Pipeline
+### The 7-Stage Intelligence Pipeline
 
 ```
-Raw CSV Data
-    │
-    ├─→ [1. INGEST]        Load CSV or synthetic data, validate schema
-    │
-    ├─→ [2. TRANSFORM]     Clean, validate, aggregate by dimensions
-    │
-    ├─→ [3. DETECT]        Isolation Forest multi-metric anomaly detection
-    │                       (tracks revenue, orders, avg_order_value)
-    │
-    ├─→ [4. ATTRIBUTE]      Root cause: dimensional breakdown with
-    │                       contribution % across 9 dimensions
-    │
-    ├─→ [5. FORECAST]       Prophet + linear fallback, 7-14 day horizon,
-    │                       confidence intervals
-    │
-    ├─→ [6. RECOMMEND]      Priority-ranked actions with impact & ownership
-    │
-    └─→ [7. SYNTHESIZE]     Claude LLM: executive narrative + confidence
-
-    Structured JSON Output
-    (anomaly, severity, root_cause[], forecast[], recommendation[])
-    │
-    └─→ [API RESPONSE]      REST endpoint, HTML report, or save to S3
+ ┌─────────────────────────────────────────────────────────────────┐
+ │                    COSMOS INTELLIGENCE ENGINE                    │
+ │              Architected by Vivek Kommareddy                    │
+ └─────────────────────────────────────────────────────────────────┘
+                              │
+                    ┌─────────▼─────────┐
+                    │   Raw CSV Input    │
+                    │  (any business    │
+                    │   data format)    │
+                    └─────────┬─────────┘
+                              │
+          ┌───────────────────▼───────────────────┐
+          │                                       │
+  ┌───────▼────────┐                    ┌─────────▼────────┐
+  │  1. INGEST     │                    │                   │
+  │                │   Load CSV/Excel,  │   Auto-detect     │
+  │  Schema        │◄──────────────────►│   schema, types,  │
+  │  Detection     │                    │   date columns    │
+  └───────┬────────┘                    └──────────────────┘
+          │
+  ┌───────▼────────┐
+  │  2. TRANSFORM  │   Clean nulls, validate ranges,
+  │                │   aggregate by date & dimensions,
+  │  Data Quality  │   compute period-over-period deltas
+  └───────┬────────┘
+          │
+  ┌───────▼────────┐
+  │  3. DETECT     │   Isolation Forest (unsupervised ML)
+  │                │   Multi-metric: revenue + orders + AOV
+  │  Anomaly       │   Severity: CRITICAL / WARNING / NORMAL
+  │  Detection     │   Contamination threshold: configurable
+  └───────┬────────┘
+          │
+  ┌───────▼────────┐
+  │  4. ATTRIBUTE  │   9-Dimension root cause breakdown:
+  │                │   Region · Product · Campaign · Category
+  │  Root Cause    │   Channel · Segment · Time · SKU · Agent
+  │  Analysis      │   Each with delta % and contribution score
+  └───────┬────────┘
+          │
+  ┌───────▼────────┐
+  │  5. FORECAST   │   Facebook Prophet + Linear Regression
+  │                │   7–14 day forward projection
+  │  Predictive    │   95% confidence interval upper/lower bands
+  │  Modeling      │   Seasonal decomposition & trend isolation
+  └───────┬────────┘
+          │
+  ┌───────▼────────┐
+  │  6. RECOMMEND  │   Playbook-driven action generation
+  │                │   Priority scoring (P1–P3), impact estimate,
+  │  Action        │   timeline, owner assignment
+  │  Engine        │   Cross-references forecast + root cause
+  └───────┬────────┘
+          │
+  ┌───────▼────────┐
+  │  7. SYNTHESIZE │   Anthropic Claude (Haiku / Sonnet)
+  │                │   Grounded narrative from structured data
+  │  Claude LLM    │   Executive-readable language
+  │  Explanation   │   Confidence score + fallback mode
+  └───────┬────────┘
+          │
+  ┌───────▼─────────────────────────────────────────────┐
+  │              STRUCTURED JSON OUTPUT                  │
+  │  anomaly_detected · severity · root_cause[]          │
+  │  forecast_values[] · CI_lower · CI_upper             │
+  │  recommendation[] · explanation · confidence         │
+  └─────────────────────────────────────────────────────┘
+          │
+          ├──► REST API Response  (FastAPI /analyze)
+          ├──► HTML Executive Brief
+          ├──► AI Chat Context   (/chat endpoint)
+          └──► AWS S3 Storage    (optional)
 ```
 
-### New Endpoints (v2.0)
+### System Architecture
 
-- **POST /chat** — AI Chat Assistant: Ask questions about your dataset, get Claude-powered answers grounded in uploaded data
-- **DELETE /session** — Data Deletion: Hard-delete all session data (raw CSV, processed, outputs, AI context)
+```
+┌────────────────────────────────────────────────────────────┐
+│                     AWS CLOUD LAYER                        │
+│                                                            │
+│  ┌─────────────────────┐    ┌─────────────────────────┐  │
+│  │   AWS App Runner     │    │   AWS App Runner         │  │
+│  │   FRONTEND           │    │   BACKEND API            │  │
+│  │   Next.js 16.2.3     │◄──►│   FastAPI + Python 3.10 │  │
+│  │   0.25vCPU / 1GB RAM │    │   0.25vCPU / 0.5GB RAM  │  │
+│  └──────────┬──────────┘    └─────────────┬───────────┘  │
+│             │                              │               │
+│  ┌──────────▼──────────┐    ┌─────────────▼───────────┐  │
+│  │   AWS ECR            │    │   AWS ECR                │  │
+│  │   cosmos-client      │    │   cosmos-server          │  │
+│  │   (private registry) │    │   (private registry)     │  │
+│  └─────────────────────┘    └─────────────────────────┘  │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │  AWS Supporting Services                              │ │
+│  │  S3 · Glue · Athena · Lambda · EventBridge           │ │
+│  │  CloudWatch · IAM · KMS                              │ │
+│  └──────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────────┘
 
-### Key Components
+┌────────────────────────────────────────────────────────────┐
+│                   AI INTELLIGENCE LAYER                    │
+│                                                            │
+│  ┌──────────────────┐  ┌──────────────────┐              │
+│  │  Anthropic Claude │  │  Facebook Prophet │              │
+│  │  Haiku / Sonnet   │  │  Time-Series      │              │
+│  │  Natural Language │  │  Forecasting      │              │
+│  │  Explanation      │  │                   │              │
+│  └──────────────────┘  └──────────────────┘              │
+│                                                            │
+│  ┌──────────────────┐  ┌──────────────────┐              │
+│  │  scikit-learn     │  │  Custom Scoring   │              │
+│  │  Isolation Forest │  │  Recommendation   │              │
+│  │  Anomaly Detection│  │  Engine           │              │
+│  └──────────────────┘  └──────────────────┘              │
+└────────────────────────────────────────────────────────────┘
+```
 
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| **Frontend** | React SPA (optional) | Interactive dashboard and chat UI |
-| **API** | FastAPI | REST endpoints, auto-doc at /docs |
-| **Anomaly Detection** | scikit-learn (Isolation Forest) | Multi-metric unsupervised detection |
-| **Root Cause** | Pandas, NumPy | Dimensional attribution analysis |
-| **Forecasting** | Prophet, Linear Regression | Time-series prediction with CI |
-| **Recommendations** | Custom scoring engine | Priority & impact calculation |
-| **LLM** | Anthropic Claude (Haiku/Sonnet) | Natural language explanations |
-| **Cloud** | AWS (S3, Glue, Athena, Lambda, EventBridge) | Scalable cloud deployment |
+---
+
+## AI Engines — How Intelligence Is Generated
+
+### Engine 1: Anomaly Detection (scikit-learn Isolation Forest)
+
+Cosmos uses **Isolation Forest**, an unsupervised machine learning algorithm that detects outliers by randomly partitioning data. Unlike supervised methods, it requires no labeled training data — it learns what "normal" looks like from your own dataset.
+
+- Tracks **three metrics simultaneously**: `revenue`, `orders`, `avg_order_value`
+- Assigns severity: `CRITICAL` (contamination > threshold), `WARNING`, or `NORMAL`
+- Contamination parameter configurable in `config.yaml` (default: `0.08` = 8% expected anomaly rate)
+- Returns anomaly score per data point for drill-down analysis
+
+### Engine 2: Root Cause Attribution (Pandas + NumPy)
+
+When an anomaly is detected, the attribution engine performs a **9-dimensional breakdown** — breaking the drop/spike by every available dimension and computing what percentage of the total change each segment accounts for:
+
+```
+Dimensions analyzed:
+  ├── Region         (Northeast, South, West, Midwest)
+  ├── Product / SKU
+  ├── Campaign
+  ├── Category
+  ├── Channel
+  ├── Customer Segment
+  ├── Time-of-Day / Day-of-Week
+  ├── Sales Agent
+  └── Geography (Zip / County)
+```
+
+Each dimension returns: `delta`, `contribution_pct`, `group_value`, and `confidence`.
+
+### Engine 3: Forecasting (Facebook Prophet + Linear Regression)
+
+**Prophet** is Facebook's open-source time-series forecasting library, designed for business data with seasonal trends. Cosmos uses it to project the next 7–14 days of revenue with full uncertainty quantification:
+
+- **Seasonal decomposition**: extracts trend, weekly seasonality, and yearly seasonality
+- **95% confidence intervals**: returns both `lower` and `upper` bands
+- **Linear regression fallback**: automatically activates when Prophet fails (insufficient data)
+- Handles missing data, outliers, and irregular time series natively
+
+### Engine 4: Recommendation Engine (Custom Scoring)
+
+A **playbook-driven system** that cross-references the anomaly detection result, root cause breakdown, and forecast trajectory to generate prioritized action items:
+
+- Scores recommendations by **priority** (P1/P2/P3), **expected impact** (revenue %, timeline), and **owner** (Marketing, Ops, Finance)
+- References a curated playbook of response patterns mapped to anomaly types
+- Returns ranked list with: `action`, `priority`, `expected_impact`, `timeline`, `owner`
+
+### Engine 5: Claude LLM — Two Specific Use Points (Anthropic)
+
+Anthropic Claude is used in **exactly two places** in the codebase — both require the user to provide an `ANTHROPIC_API_KEY` in the `.env` file. Without it, both fall back to deterministic template responses automatically.
+
+**Use Point 1 — `llm/explain.py` (Stage 7 of /analyze pipeline)**
+
+After data is uploaded and the full 6-stage analysis completes, Claude generates a concise 3-sentence executive narrative. The entire structured pipeline output is passed as grounded context — Claude never invents numbers:
+
+```
+Prompt context passed to Claude:
+  METRIC SIGNALS:   revenue/orders/AOV with % change + anomaly flags
+  ROOT CAUSE:       top contributing dimensions with % attribution
+  FORECAST:         7-14 day prediction
+  RECOMMENDED ACTIONS: P1/P2/P3 priority actions
+→ Claude outputs: 3-sentence executive briefing
+```
+
+**Use Point 2 — `llm/chat.py` (POST /chat endpoint)**
+
+After data has been uploaded and analyzed, users can ask natural language follow-up questions via the AI assistant. Claude answers grounded entirely in the pipeline context — no generic responses:
+
+```json
+POST /chat
+{
+  "question": "Which region is driving the decline?",
+  "context": { /* full pipeline output */ },
+  "api_key": "sk-ant-..." // optional: user's own key
+}
+→ Claude outputs: data-specific answer (max 3 sentences)
+```
+
+**Important**: The `confidence` score (0.0–0.95) returned in the response is computed **deterministically** — it is NOT generated by Claude. It is calculated based on signal strength: anomaly severity, revenue delta magnitude, root cause count, forecast consistency, etc.
+
+- **Model**: `claude-haiku-4-5-20251001` (configurable to `claude-sonnet-4-6` in config.yaml)
+- **Max tokens**: 300 (explain.py) / 200 (chat.py)
+- **Fallback**: 100% deterministic template fallback for both use points when API is unavailable
+
+---
+
+## Live Deployment
+
+```
+Production Frontend:  https://6nmkmjhh5i.us-east-1.awsapprunner.com
+API Health Check:     https://bpc53g62fh.us-east-1.awsapprunner.com/health
+```
+
+**Infrastructure specs (AWS App Runner + ECR):**
+
+| Service | Specs | Monthly Cost |
+|---------|-------|--------------|
+| Frontend (Next.js) | 0.25 vCPU / 1.0 GB RAM | ~$5/month idle |
+| Backend (FastAPI) | 0.25 vCPU / 0.5 GB RAM | ~$3/month idle |
+| Container Registry | ECR private repositories | Cents |
+
+**Total idle cost: ~$8/month** — designed for presentation and enterprise demo scale.
 
 ---
 
 ## Quick Start
 
-### 1. Setup (Local)
+### Local Development
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/cosmos-intelligence.git
-cd cosmos-intelligence
+git clone https://github.com/Vivek-Kommareddy/COSMOS-INTELLIGENCE.git
+cd COSMOS-INTELLIGENCE
 
-# Create and activate virtual environment
+# Backend setup
 python3 -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env and add ANTHROPIC_API_KEY for LLM explanations
-```
+# Add your ANTHROPIC_API_KEY to .env
 
-### 2. Run the Pipeline
-
-```bash
-# Run the full intelligence pipeline
+# Run the full 7-stage pipeline
 make run
+# or
+python run_pipeline.py --pretty --html
 
-# Or with CLI output
-python run_pipeline.py --pretty
-
-# Generate HTML executive brief
-make demo
-
-# Generate JSON output only
-make json
-```
-
-### 3. Start the API
-
-```bash
+# Start API server (http://localhost:8000/docs)
 make api
-# Open browser to http://localhost:8000/docs
+
+# Run frontend
+cd client && npm install && npm run dev   # → http://localhost:3000
 ```
 
-### 4. Run Tests
+### Run Tests (44 test cases)
 
 ```bash
 pytest -v --cov=src tests/
-# 44 test cases covering all pipeline stages
+```
+
+### Docker (Single Command)
+
+```bash
+docker-compose up --build
 ```
 
 ---
 
 ## API Reference
 
-All endpoints return structured JSON. Responses include timestamps, processing time, and confidence scores.
+Base URL (production): `https://bpc53g62fh.us-east-1.awsapprunner.com`
 
-### System & Health
+All endpoints return structured JSON with `timestamp`, `processing_time_ms`, and `confidence`.
 
-```bash
-GET /health
-```
-
-Response:
+### `GET /health`
 ```json
 {
   "status": "healthy",
   "version": "2.0.0",
-  "timestamp": "2025-04-07T12:30:45Z",
-  "uptime_seconds": 3600.5
+  "timestamp": "2026-04-10T12:30:45Z",
+  "uptime_seconds": 86400
 }
 ```
 
-### Full Intelligence Pipeline
+### `GET /analyze` — Full 7-Stage Pipeline
+Runs all engines: ingest → transform → detect → attribute → forecast → recommend → synthesize.
 
-```bash
-GET /analyze
+```json
+{
+  "anomaly_detected": true,
+  "severity": "CRITICAL",
+  "root_cause": [
+    { "dimension": "region", "group_value": "West", "delta": -0.32, "contribution_pct": 62.4 }
+  ],
+  "forecast_values": [102000, 103400, 104900],
+  "forecast_confidence_lower": [95000, 96400, 97900],
+  "forecast_confidence_upper": [109000, 110400, 111900],
+  "recommendation": [
+    {
+      "action": "Reactivate Campaign A in West region",
+      "priority": "P1",
+      "expected_impact": "+15-25% revenue recovery",
+      "timeline": "48 hours",
+      "owner": "Marketing"
+    }
+  ],
+  "explanation": "Revenue declined 22.4% primarily driven by the West region...",
+  "confidence": 0.87,
+  "llm_powered": true
+}
 ```
 
-Executes all 7 stages: ingest → transform → detect → attribute → forecast → recommend → synthesize.
-
-Response includes:
-- `anomaly_detected` (boolean)
-- `severity` (CRITICAL, WARNING, NORMAL)
-- `root_cause[]` with dimension, group_value, delta, contribution_pct
-- `forecast_values[]` (7-day predictions)
-- `forecast_confidence_lower/upper` (95% confidence intervals)
-- `recommendation[]` with action, priority, expected_impact, timeline, owner
-- `explanation` (Claude-generated narrative)
-- `confidence` (0.0-1.0 overall confidence score)
-
-### Forecast Only
-
+### `GET /forecast` — 7-Day Forecast Only
 ```bash
 GET /forecast
 ```
+Returns Prophet-powered 7-day predictions with upper/lower 95% confidence bands.
 
-Returns 7-day forecast with confidence intervals (skips anomaly detection and root cause).
-
-Response:
-```json
-{
-  "prediction": "Revenue forecast shows 5.2% growth over 7 days",
-  "forecast_values": [102000, 103400, 104900, ...],
-  "confidence_lower": [95000, 96400, 97900, ...],
-  "confidence_upper": [109000, 110400, 111900, ...],
-  "model": "Prophet",
-  "periods": 7,
-  "timestamp": "2025-04-07T12:30:45Z"
-}
-```
-
-### Upload & Analyze
-
+### `POST /upload` — Upload Your CSV
 ```bash
 POST /upload
 Content-Type: multipart/form-data
-
-file: <your-csv>
+file: <your-business-data.csv>
 ```
+Uploads, processes, and runs the full pipeline on your dataset. Returns full `DecisionResponse`.
 
-Uploads a CSV, processes it, and runs the full pipeline.
-
-Response: Full `DecisionResponse` JSON.
-
-### AI Chat Assistant (NEW)
-
+### `POST /chat` — AI Q&A (Claude-Powered)
 ```bash
 POST /chat
 Content-Type: application/json
 
 {
-  "question": "Which region is driving the revenue decline?",
-  "context": { /* pipeline output JSON */ }
+  "question": "Which region is driving the decline?",
+  "context": { /* pipeline output */ }
 }
 ```
+Ask any question about your data. Claude answers grounded in your specific dataset.
 
-Response:
-```json
-{
-  "answer": "The West region is the primary driver, with a 24% contribution to the overall decline. Campaign A's cessation accounts for 62% of the impact...",
-  "llm_powered": true,
-  "timestamp": "2025-04-07T12:30:45Z"
-}
-```
-
-### Delete Session Data (NEW)
-
+### `DELETE /session` — Hard Delete All Data
 ```bash
 DELETE /session
 ```
+Permanently and irreversibly deletes: raw CSV → processed data → pipeline outputs → AI context cache. GDPR/CCPA compliant.
 
-Permanently hard-deletes all session data:
-- Raw CSV upload
-- Processed data
-- Generated outputs
-- AI context cache
-
-Response:
 ```json
 {
   "status": "deleted",
-  "timestamp": "2025-04-07T12:30:45Z",
-  "items_deleted": ["raw_csv", "processed_data", "outputs", "ai_context"]
+  "items_deleted": ["raw_csv", "processed_data", "outputs", "ai_context"],
+  "timestamp": "2026-04-10T12:30:45Z"
 }
 ```
 
@@ -264,266 +409,137 @@ Response:
 ## Project Structure
 
 ```
-cosmos-intelligence/
+COSMOS-INTELLIGENCE/
 │
-├── config/
-│   └── config.yaml                 # All tunable parameters
+├── server/                              # FastAPI backend (Python 3.10+)
+│   │
+│   ├── app/engine/                      # Core intelligence engine
+│   │   ├── api/
+│   │   │   └── main.py                  # FastAPI app — all 7 REST endpoints + CORS
+│   │   │
+│   │   ├── ingestion/
+│   │   │   └── ingest.py                # Stage 1 — Load CSV, auto-detect schema
+│   │   │
+│   │   ├── processing/
+│   │   │   └── transform.py             # Stage 2 — Clean, validate, aggregate
+│   │   │
+│   │   ├── anomaly/
+│   │   │   └── detect.py                # Stage 3 — Isolation Forest multi-metric
+│   │   │
+│   │   ├── root_cause/
+│   │   │   └── analyze.py               # Stage 4 — 9-dimension root cause attribution
+│   │   │
+│   │   ├── forecasting/
+│   │   │   └── forecast.py              # Stage 5 — Prophet + linear regression
+│   │   │
+│   │   ├── recommendation/
+│   │   │   └── recommend.py             # Stage 6 — Playbook-driven action engine
+│   │   │
+│   │   ├── llm/
+│   │   │   ├── explain.py               # Stage 7 — Claude API: executive narrative
+│   │   │   └── chat.py                  # Claude API: AI Q&A for /chat endpoint
+│   │   │
+│   │   ├── aws/
+│   │   │   ├── s3_ops.py                # S3 upload/download
+│   │   │   ├── glue_ops.py              # AWS Glue ETL orchestration
+│   │   │   ├── athena_ops.py            # SQL queries via Athena
+│   │   │   ├── lambda_handler.py        # Lambda entry point
+│   │   │   ├── eventbridge_ops.py       # EventBridge scheduling
+│   │   │   ├── setup.py                 # One-command AWS bootstrap
+│   │   │   ├── glue_etl_script.py       # ETL script for Glue jobs
+│   │   │   └── cloudformation.yaml      # Infrastructure-as-Code
+│   │   │
+│   │   ├── reporting/
+│   │   │   ├── html_report.py           # HTML executive brief generator
+│   │   │   └── cli_output.py            # Rich CLI formatting
+│   │   │
+│   │   └── utils/
+│   │       ├── helpers.py               # Config loading, path management
+│   │       └── logger.py                # Structured JSON logging (CloudWatch-ready)
+│   │
+│   ├── data/
+│   │   ├── raw/source.csv               # Demo dataset (the project runs on this)
+│   │   └── processed/processed.csv      # Cleaned & aggregated pipeline output
+│   │
+│   ├── tests/                           # 44 pytest test cases
+│   │   ├── conftest.py                  # Shared test fixtures
+│   │   ├── test_transform.py            # 8 cases — data cleaning & aggregation
+│   │   ├── test_anomaly.py              # 8 cases — Isolation Forest, severity
+│   │   ├── test_forecast.py             # 7 cases — Prophet, confidence intervals
+│   │   ├── test_recommend.py            # 8 cases — priority, impact scoring
+│   │   └── test_pipeline.py             # 13 cases — end-to-end integration
+│   │
+│   ├── config/
+│   │   └── config.yaml                  # All tunable pipeline parameters
+│   │
+│   ├── run_pipeline.py                  # 7-stage CLI orchestrator
+│   ├── requirements.txt                 # Pinned Python dependencies
+│   └── Dockerfile                       # Backend container build
+│
+├── client/                              # Next.js 16.2.3 frontend
+│   ├── app/
+│   │   ├── page.tsx                     # Landing page (hero, pipeline, features)
+│   │   ├── layout.tsx                   # Root layout + metadata
+│   │   ├── upload/
+│   │   │   ├── page.tsx                 # File upload + demo trigger
+│   │   │   └── UploadClient.tsx         # Client-side upload component
+│   │   ├── dashboard/
+│   │   │   └── page.tsx                 # Interactive results dashboard + AI chat
+│   │   └── api/
+│   │       └── health/route.ts          # Frontend health check endpoint
+│   │
+│   ├── components/
+│   │   └── PlotlyChart.tsx              # Interactive chart component
+│   │
+│   ├── next.config.ts                   # standalone output (90% size reduction)
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
+│   └── package.json
 │
 ├── data/
-│   ├── raw/source.csv              # Input CSV (user-provided or generated)
-│   └── processed/processed.csv     # Cleaned and aggregated output
+│   └── sample_datasets/                 # 3 sample datasets for testing
+│       ├── sample_retail_sales.csv      # Retail industry employees dataset
+│       ├── sample_ecommerce.csv         # E-commerce industry employees dataset
+│       └── sample_saas_metrics.csv      # SaaS/Tech industry employees dataset
 │
 ├── docs/
-│   ├── AWS_SETUP_GUIDE.md         # Step-by-step AWS deployment
-│   └── cosmos-intelligence-architecture.docx  # Technical architecture
+│   └── cosmos-intelligence-platform-documentation.docx
 │
-├── src/
-│   ├── api/
-│   │   └── main.py                 # FastAPI app, 7 endpoints, auto-doc
-│   │
-│   ├── ingestion/
-│   │   └── ingest.py               # Load CSV, validate schema, synthetic gen
-│   │
-│   ├── processing/
-│   │   └── transform.py            # Clean, validate, aggregate by dimensions
-│   │
-│   ├── anomaly/
-│   │   └── detect.py               # Isolation Forest, multi-metric, severity
-│   │
-│   ├── root_cause/
-│   │   └── analyze.py              # 9-dimension attribution, contribution %
-│   │
-│   ├── forecasting/
-│   │   └── forecast.py             # Prophet + linear fallback, confidence CI
-│   │
-│   ├── recommendation/
-│   │   └── recommend.py            # Priority scoring, impact, ownership
-│   │
-│   ├── llm/
-│   │   └── explain.py              # Claude API, deterministic fallback
-│   │
-│   ├── aws/
-│   │   ├── s3_ops.py               # S3 upload/download with retry
-│   │   ├── glue_ops.py             # AWS Glue job orchestration
-│   │   ├── athena_ops.py           # SQL query via Athena
-│   │   ├── lambda_handler.py       # Lambda entry point
-│   │   ├── eventbridge_ops.py      # Schedule with EventBridge
-│   │   ├── setup.py                # One-command AWS bootstrap
-│   │   ├── glue_etl_script.py      # ETL in AWS Glue
-│   │   └── cloudformation.yaml     # Infrastructure-as-Code
-│   │
-│   ├── reporting/
-│   │   ├── html_report.py          # Executive HTML brief generator
-│   │   └── cli_output.py           # Rich CLI formatting
-│   │
-│   └── utils/
-│       ├── helpers.py              # Config loading, path management
-│       └── logger.py               # Structured JSON logging (CloudWatch-ready)
-│
-├── tests/
-│   ├── conftest.py                 # Shared test fixtures
-│   ├── test_transform.py           # Data processing (8 cases)
-│   ├── test_anomaly.py             # Anomaly detection (8 cases)
-│   ├── test_forecast.py            # Forecasting (7 cases)
-│   ├── test_recommend.py           # Recommendations (8 cases)
-│   └── test_pipeline.py            # End-to-end integration (13 cases)
-│
-├── .env.example                    # Environment variable template
-├── requirements.txt                # Pinned dependencies (Python 3.10+)
-├── Makefile                        # CLI shortcuts
-├── run_pipeline.py                 # Standalone CLI runner
-├── Dockerfile                      # Container definition
-└── README.md                       # This file
+├── .env.example                         # Environment variable template
+├── .gitignore
+├── .dockerignore
+├── Makefile                             # make run / make api / make demo
+├── Dockerfile                           # Root multi-stage container build
+├── docker-compose.yml                   # Local dev orchestration
+└── README.md
 ```
 
 ---
 
 ## Configuration
 
-### config.yaml Reference
+### `config.yaml` Reference
 
-Key settings that control pipeline behavior:
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `anomaly.contamination` | `0.08` | Expected anomaly fraction (0.0–1.0) |
+| `anomaly.tracked_metrics` | `[revenue, orders, avg_order_value]` | Metrics for multi-metric detection |
+| `forecast.periods` | `7` | Days to forecast ahead |
+| `forecast.include_confidence_intervals` | `true` | Include 95% CI bands |
+| `llm.model` | `claude-haiku-4-5-20251001` | Swap to `claude-sonnet-4-6` for higher quality |
+| `llm.max_tokens` | `300` | Max tokens in LLM narrative |
+| `llm.fallback_to_deterministic` | `true` | Template fallback if API unavailable |
+| `api.enable_auth` | `false` | Require `X-API-Key` header |
+| `data.lookback_days` | `14` | Historical window for analysis |
+| `aws.region` | `us-east-1` | AWS region for cloud services |
 
-| Setting | Default | Type | Description |
-|---------|---------|------|-------------|
-| `data.lookback_days` | 14 | int | Historical window for anomaly detection |
-| `data.comparison_days` | 14 | int | Prior period for % change calculation |
-| `anomaly.contamination` | 0.08 | float | Expected fraction of anomalous points (0.0-1.0) |
-| `anomaly.tracked_metrics` | [revenue, orders, avg_order_value] | list | Metrics included in multi-metric detection |
-| `forecast.periods` | 7 | int | Days to forecast ahead |
-| `forecast.include_confidence_intervals` | true | bool | Include 95% CI in forecast |
-| `llm.model` | claude-haiku-4-5-20251001 | str | Claude model (haiku=fast, sonnet=high quality) |
-| `llm.max_tokens` | 300 | int | Max tokens in LLM explanation |
-| `llm.fallback_to_deterministic` | true | bool | Use template if API fails |
-| `api.enable_auth` | false | bool | Require X-API-Key header on requests |
-| `aws.s3_upload_on_complete` | false | bool | Auto-upload results to S3 after run |
-| `aws.region` | us-east-1 | str | AWS region for cloud deployment |
-
-### Environment Variables
-
-Set these in `.env` (never in config.yaml):
+### Environment Variables (`.env`)
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-...                  # Anthropic API key for Claude
-API_KEY=cosmos-secret-2025                    # Optional: API key for /analyze endpoint
-AWS_ACCESS_KEY_ID=AKIA...                     # AWS credentials (if using Phase 2)
+ANTHROPIC_API_KEY=sk-ant-...        # Required for LLM explanations
+API_KEY=cosmos-secret-2025          # Optional: API key auth
+AWS_ACCESS_KEY_ID=AKIA...           # AWS credentials (cloud deployment)
 AWS_SECRET_ACCESS_KEY=...
-OPENTELEMETRY_ENDPOINT=http://localhost:4317  # Optional: observability
-```
-
----
-
-## AWS Deployment (Phase 2)
-
-For cloud-scale processing:
-
-```bash
-# One-command deployment via CloudFormation
-aws cloudformation deploy \
-  --template-file src/aws/cloudformation.yaml \
-  --stack-name cosmos-intelligence \
-  --parameter-overrides BucketName=cosmos-intelligence-yourname \
-  --capabilities CAPABILITY_NAMED_IAM
-```
-
-### Architecture
-
-| Service | Role |
-|---------|------|
-| **S3** | Store raw uploads, processed data, outputs, and audit logs |
-| **Glue** | Serverless ETL: clean and transform at scale |
-| **Athena** | SQL queries on processed data in S3 |
-| **Lambda** | Stateless pipeline execution (triggered by API or schedule) |
-| **EventBridge** | Schedule pipeline daily (or on-demand) |
-| **CloudWatch** | Logs, metrics, alarms (structured JSON logging) |
-| **IAM** | Fine-grained role-based access control |
-| **KMS** | Optional encryption for sensitive data |
-
-See **[AWS_SETUP_GUIDE.md](docs/AWS_SETUP_GUIDE.md)** for step-by-step instructions.
-
----
-
-## Data Privacy & Deletion
-
-Cosmos Intelligence is designed for enterprise data privacy compliance.
-
-### Hard Delete Flow
-
-When `DELETE /session` is called, the system permanently removes:
-
-1. **Raw CSV Upload** — Original user-provided data file
-2. **Processed Data** — Cleaned and aggregated dataset
-3. **Pipeline Outputs** — JSON results and HTML reports
-4. **AI Context Cache** — Embedding cache used for /chat endpoint
-5. **Audit Logs** — Session metadata and processing timestamps
-
-All files are deleted from:
-- Local filesystem (if running locally)
-- AWS S3 (if using cloud deployment)
-- CloudWatch logs (log retention policy enforced)
-
-### No Data Retention Without Consent
-
-- Cosmos Intelligence does **not** retain data beyond the session
-- No background processes access deleted data
-- No analytics tracking of user uploads
-- GDPR/CCPA compliant deletion procedures
-
-### Audit Trail
-
-All deletions are logged to CloudWatch (JSON format):
-```json
-{
-  "timestamp": "2025-04-07T12:30:45Z",
-  "event": "session_delete",
-  "session_id": "sess_abc123",
-  "items_deleted": 5,
-  "duration_ms": 234
-}
-```
-
----
-
-## LLM Integration
-
-### Anthropic Claude
-
-Cosmos Intelligence uses **Claude by Anthropic** for intelligent explanations.
-
-**Default Model**: `claude-haiku-4-5-20251001` (fast, cost-efficient, 100k context window)
-
-**Alternative**: `claude-sonnet-4-6` (higher quality, more detail, 200k context window)
-
-Switch models in `config.yaml`:
-
-```yaml
-llm:
-  model: claude-sonnet-4-6  # Upgrade for higher quality
-  max_tokens: 500
-```
-
-### Fallback Behavior
-
-If `ANTHROPIC_API_KEY` is not set or the API fails:
-
-1. System automatically generates a deterministic explanation using rule-based templates
-2. `llm_powered: false` in response JSON indicates fallback mode
-3. All other pipeline stages (anomaly, forecast, recommend) continue normally
-
-### Context Strategy
-
-For the `/chat` endpoint, the entire pipeline output is passed to Claude as structured context:
-
-```json
-{
-  "question": "Which region is driving the decline?",
-  "context": {
-    "anomaly_detected": true,
-    "root_cause": [...],
-    "forecast": [...],
-    "recommendation": [...]
-  }
-}
-```
-
-This allows Claude to answer follow-up questions grounded in your specific data.
-
----
-
-## Running Tests
-
-### Test Suite
-
-44 test cases covering all pipeline stages:
-
-```bash
-# Run all tests with coverage
-pytest -v --cov=src --cov-report=term-missing tests/
-
-# Run specific test file
-pytest tests/test_anomaly.py -v
-
-# Run fast test suite (no slow integration tests)
-pytest tests/ -x
-```
-
-### Test Coverage
-
-| Module | Tests | Coverage |
-|--------|-------|----------|
-| Transform | 8 | Data cleaning, aggregation, edge cases |
-| Anomaly | 8 | Isolation Forest, severity scoring, multi-metric |
-| Forecast | 7 | Prophet, confidence intervals, fallback |
-| Recommend | 8 | Priority scoring, impact calculation, ownership |
-| Pipeline | 13 | End-to-end integration, API contract |
-
-### Sample Output
-
-```
-tests/test_anomaly.py::test_isolation_forest_detects_outliers PASSED
-tests/test_forecast.py::test_prophet_confidence_intervals PASSED
-tests/test_recommend.py::test_recommendation_priority_scoring PASSED
-===================== 44 passed in 2.34s =====================
 ```
 
 ---
@@ -532,129 +548,125 @@ tests/test_recommend.py::test_recommendation_priority_scoring PASSED
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| **Runtime** | Python 3.10+ | Type safety, dataclass support, modern async |
-| **Web Framework** | FastAPI | Async, auto-doc generation, Pydantic validation |
-| **ML** | scikit-learn | Isolation Forest unsupervised learning |
-| **Time Series** | Prophet, statsmodels | Robust forecasting with seasonality |
-| **Data** | Pandas, NumPy | Standard data manipulation |
-| **LLM** | Anthropic Claude | Enterprise AI, low latency, high accuracy |
-| **Visualization** | Plotly | Interactive HTML reports, easy embedding |
-| **Testing** | pytest | Fast, fixture-based, excellent coverage tools |
-| **Cloud** | AWS S3, Glue, Athena, Lambda, EventBridge | Serverless, auto-scaling, pay-per-use |
-| **Logging** | Structured JSON, CloudWatch | Searchable logs, production-ready |
-| **Container** | Docker | Local dev → cloud deployment consistency |
+| **Frontend** | Next.js 16.2.3, React, Framer Motion | SSR, 3D animations, standalone Docker build |
+| **Backend** | FastAPI, Python 3.10+, Uvicorn | Async, auto-docs, Pydantic validation |
+| **Anomaly Detection** | scikit-learn (Isolation Forest) | Unsupervised, no labeled data required |
+| **Forecasting** | Facebook Prophet, statsmodels | Seasonal decomposition, robust CI |
+| **Data Processing** | Pandas, NumPy | Fast aggregation, transformation |
+| **LLM** | Anthropic Claude (Haiku/Sonnet) | Grounded, low-hallucination business narrative |
+| **Visualization** | Plotly | Interactive HTML reports |
+| **Testing** | pytest (44 cases) | Full coverage across all pipeline stages |
+| **Containerization** | Docker, docker-compose | Dev-to-prod consistency |
+| **Cloud Hosting** | AWS App Runner | Managed, auto-scaling, zero-ops |
+| **Container Registry** | AWS ECR (private) | Secure image storage |
+| **Cloud Storage** | AWS S3 | Raw data, outputs, audit logs |
+| **ETL** | AWS Glue | Serverless data transformation at scale |
+| **Query Engine** | AWS Athena | SQL on S3 without infrastructure |
+| **Scheduling** | AWS EventBridge | Pipeline scheduling, event routing |
+| **Observability** | AWS CloudWatch | Structured JSON logs, alarms |
+| **Security** | AWS IAM, KMS | Fine-grained access control, encryption |
+| **Styling** | Tailwind CSS | Rapid UI development |
+| **UI Animations** | Three.js, Framer Motion | Premium 3D dashboard effects |
 
 ---
 
-## Performance Characteristics
+## Data Privacy
 
-### Latency
+Cosmos Intelligence is built with **zero-retention by design**:
 
-- **Full Pipeline**: 1-3 seconds (local machine)
-- **Forecast Only**: 500ms
-- **API Response Time**: Includes processing + LLM (typically 2-5s with Claude)
-
-### Concurrency
-
-- **FastAPI**: Async/await supports 1000+ concurrent requests
-- **AWS Lambda**: Auto-scales to match request volume
-- **Glue ETL**: Distributed processing on up to 100 DPUs
-
-### Data Scale
-
-- **CSV Input**: Tested up to 1M rows
-- **Time Series Window**: 14-90 days recommended
-- **Dimensions**: Supports 9+ dimensions (region, product, campaign, etc.)
+1. Data is processed **in-memory** — never persisted without explicit user action
+2. `DELETE /session` permanently removes: raw CSV, processed data, all pipeline outputs, AI context cache
+3. No background processes, no analytics tracking of uploaded data
+4. **GDPR/CCPA compliant** deletion procedures
+5. All `.md`, `CLAUDE*`, and `AGENTS*` files are excluded from Docker images via `.dockerignore`
 
 ---
 
-## Production Checklist
+## Performance
 
-Before deploying to production:
+| Metric | Value |
+|--------|-------|
+| Full 7-stage pipeline | 1–3 seconds |
+| Forecast only | ~500ms |
+| API with Claude | 2–5 seconds (LLM latency) |
+| Concurrent requests (FastAPI async) | 1,000+ |
+| CSV input tested up to | 1M rows |
+| Test suite | 44 cases, ~2.3s runtime |
 
-- [ ] Set `ANTHROPIC_API_KEY` in secrets manager
-- [ ] Enable API key authentication: `api.enable_auth: true`
-- [ ] Configure AWS S3 bucket for outputs
-- [ ] Set up CloudWatch alarms for Lambda failures
-- [ ] Enable VPC for Lambda (if processing sensitive data)
-- [ ] Configure KMS encryption for S3 buckets
-- [ ] Review IAM roles and restrict permissions
-- [ ] Set up log retention policies (90 days recommended)
-- [ ] Test DELETE /session endpoint with sample data
-- [ ] Document runbook for incidents
+---
+
+## Deployment — AWS App Runner
+
+```bash
+# Build and push to ECR (automated script)
+./deploy_to_ecr.sh
+
+# Or manually via CloudFormation
+aws cloudformation deploy \
+  --template-file server/app/engine/aws/cloudformation.yaml \
+  --stack-name cosmos-intelligence \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+
+AWS services provisioned:
+
+| Service | Role |
+|---------|------|
+| **App Runner** | Managed container hosting — frontend + backend |
+| **ECR** | Private Docker image registry |
+| **S3** | Raw uploads, processed data, output storage |
+| **Glue** | Serverless ETL at dataset scale |
+| **Athena** | SQL analytics on S3 |
+| **Lambda** | Serverless pipeline execution |
+| **EventBridge** | Scheduled pipeline runs |
+| **CloudWatch** | Logs, metrics, alarms |
+| **IAM** | Role-based access, `AppRunnerECRAccessRole` |
+| **KMS** | Optional encryption for sensitive data |
+
+---
+
+## Test Suite
+
+```bash
+# Full suite with coverage
+pytest -v --cov=src --cov-report=term-missing tests/
+
+# Individual modules
+pytest tests/test_anomaly.py -v
+pytest tests/test_forecast.py -v
+```
+
+| Module | Tests | What's Covered |
+|--------|-------|----------------|
+| Transform | 8 | Data cleaning, aggregation, edge cases |
+| Anomaly | 8 | Isolation Forest, severity scoring, multi-metric |
+| Forecast | 7 | Prophet, confidence intervals, linear fallback |
+| Recommend | 8 | Priority scoring, impact calculation, ownership |
+| Pipeline | 13 | End-to-end integration, API contract |
 
 ---
 
 ## Roadmap
 
-### Phase 1: Core Platform (Current)
-- Multi-metric anomaly detection
-- Root cause attribution
-- Forecasting with confidence intervals
-- AI-powered recommendations
-- REST API
-- HTML executive briefs
-- Local + AWS deployment
-
-### Phase 2: Multi-Tenant SaaS
-- User authentication & authorization
-- Organization/workspace isolation
-- Custom metric configuration
-- Role-based access control
-- Usage metering & billing integration
-
-### Phase 3: Real-Time Streaming
-- Kafka/Kinesis integration
-- Sub-second anomaly detection
-- Real-time dashboards
-- Alert notifications
-
-### Phase 4: Custom ML Models
-- Fine-tune Claude on your business data
-- Custom anomaly detection models
-- Domain-specific language models
-
----
-
-## Support & Contributing
-
-### Issues & Bugs
-
-Open an issue with:
-- Your config.yaml (redact sensitive values)
-- Sample CSV data (or describe schema)
-- Expected vs. actual output
-- Full stack trace
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit with clear messages (`git commit -m "Add X feature"`)
-4. Push and open a pull request
-
-### Architecture Questions?
-
-See **[cosmos-intelligence-architecture.docx](docs/cosmos-intelligence-architecture.docx)** for detailed technical design.
+- **Phase 1** ✅ Core platform — anomaly detection, root cause, forecasting, recommendations, REST API, AWS deployment
+- **Phase 2** — Multi-tenant SaaS: user auth, workspace isolation, RBAC, billing
+- **Phase 3** — Real-time streaming: Kafka/Kinesis, sub-second detection, live dashboards
+- **Phase 4** — Custom ML: fine-tuned Claude on business data, domain-specific models
 
 ---
 
 ## License
 
-MIT License — See LICENSE file for full terms.
+MIT License — see [LICENSE](LICENSE) for full terms.
 
 ---
 
-## Acknowledgments
+<div align="center">
 
-Built with:
-- **Anthropic Claude** for intelligent explanations
-- **Facebook Prophet** for robust forecasting
-- **scikit-learn** for anomaly detection
-- **FastAPI** for the REST API framework
+**✦ ARCHITECTED BY VIVEK KOMMAREDDY ✦**
 
----
+[GitHub](https://github.com/Vivek-Kommareddy) · [Repository](https://github.com/Vivek-Kommareddy/COSMOS-INTELLIGENCE)
 
-**Last Updated**: April 7, 2025
-**Version**: 2.0.0
-**Status**: Production Ready
+*Cosmos Intelligence — Where raw data becomes executive decisions.*
+
+</div>

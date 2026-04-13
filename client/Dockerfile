@@ -21,6 +21,10 @@ COPY . .
 # Next.js telemetry disable
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Bake the API_URL into the build for standalone rewrites
+ARG API_URL
+ENV API_URL=$API_URL
+
 RUN npm run build
 
 # Production image, copy all the files and run next

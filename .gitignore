@@ -1,62 +1,43 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
+# =========================
+# 🚫 Sensitive / Internal Docs
+# =========================
+concept.md
+COSMOS_INTELLIGENCE_DEPLOYMENT_REPORT.md
 
-# Virtual environments
-venv/
-.venv/
-env/
+# AI / Agent session files
+CLAUDE*
+AGENTS*
+
+# =========================
+# 🔐 Secrets (NEVER COMMIT)
+# =========================
 .env
 
-# Next.js / Node
+# =========================
+# 🐍 Python
+# =========================
+__pycache__/
+*.pyc
+venv/
+
+# =========================
+# 🌐 Node / Next.js
+# =========================
 node_modules/
-.pnp
-.pnp.js
 .next/
-out/
-build/
 
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+# =========================
+# 📊 Data (PII + generated)
+# =========================
+data/raw/source.csv
+data/processed/
 
-# Local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Server Data / Outputs
-server/data/raw/*
-!server/data/raw/.gitkeep
-server/data/processed/*
-!server/data/processed/.gitkeep
-server/data/synthetic/*
-!server/data/synthetic/.gitkeep
-server/outputs/*
-!server/outputs/.gitkeep
-server/dev.log
-client/dev.log
+# =========================
+# 📜 Logs
+# =========================
 *.log
 
-# Pytest
-.pytest_cache/
+# =========================
+# 🍎 macOS
+# =========================
+.DS_Store

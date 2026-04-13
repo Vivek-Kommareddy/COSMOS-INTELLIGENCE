@@ -1,20 +1,39 @@
-.git
+# Ignore git
+.git/
 .gitignore
-.env
-.venv
-venv
-__pycache__
+
+# Exclude documentation per user request (Don't add readme or claude related files)
+*.md
+CLAUDE*
+AGENTS*
+docs/
+
+# Ignore Python specific files
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.pytest_cache
-.ruff_cache
-*.egg-info
-dist
-build
-node_modules
-data/raw/*.csv
-data/processed/*.csv
+.Python
+env/
+venv/
+.venv/
+
+# Ignore Node.js
+node_modules/
+npm-debug.log*
+
+# Test and coverage artifacts
+.pytest_cache/
+
+# Ignore local outputs
 outputs/
-*.docx
-*.zip
+data/raw/
+data/processed/
+data/synthetic/
+
+# Ignore local environment variables
+.env
+.env.local
+
+# System/OS files
+.DS_Store
