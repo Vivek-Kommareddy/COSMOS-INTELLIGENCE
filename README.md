@@ -12,7 +12,6 @@
 [![Claude AI](https://img.shields.io/badge/Claude_AI-Anthropic-FF6B35?style=for-the-badge)](https://www.anthropic.com/)
 [![AWS](https://img.shields.io/badge/AWS_App_Runner-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 <br/>
 
@@ -657,7 +656,19 @@ pytest tests/test_forecast.py -v
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for full terms.
+Copyright (c) 2026 Vivek Kommareddy
+
+All rights reserved.
+
+This software and associated documentation files (the "Software") are the exclusive property of the author.
+
+No permission is granted to use, copy, modify, merge, publish, distribute, sublicense, or sell copies of the Software without explicit prior written consent from the author.
+
+Any individual or organization wishing to use this Software must contact the author to obtain a commercial or usage license.
+
+Unauthorized use is strictly prohibited.
+
+For licensing inquiries, contact: kommareddyvivek27@gmail.com
 
 ---
 
